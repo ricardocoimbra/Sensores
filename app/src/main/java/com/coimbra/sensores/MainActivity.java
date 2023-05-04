@@ -2,12 +2,19 @@ package com.coimbra.sensores;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorListener;
 import android.hardware.SensorManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,9 +43,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (sensorEvent.sensor.getType()==Sensor.TYPE_PROXIMITY) {
             String sensorValue="Proximity Value: " + sensorEvent.values[0];
             proximitySensor.setText(sensorValue);
+
             if(sensorEvent.values[0] > 0) {
                 Toast.makeText(this, "O objeto está longe", Toast.LENGTH_SHORT).show();
             } else {
+                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+                } else {
+                    v.vibrate(500);
+                }
+                Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+                Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+                r.play();
                 Toast.makeText(this, "O objeto está próximo", Toast.LENGTH_SHORT).show();
             }
         }
